@@ -1,4 +1,4 @@
-from sqlalchemy.orm import DeclarativeBase, relationship
+from sqlalchemy.orm import DeclarativeBase, relationship, Mapped
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 
 class Base(DeclarativeBase):
@@ -13,7 +13,10 @@ class FloorPlan(Base):
     bedrooms = Column(Integer, nullable=True)
     bathrooms = Column(Integer, nullable=True)
     square_feet = Column(Integer, nullable=True)
-
+    property_id = Column(Integer, ForeignKey("properties.id"), nullable=False)
+    
+    # floorplan_property = relationship("Property", back_populates="property_floorplans")
+    # interests_floorplan = relationship("Interested", back_populates="interests_floorplan")
 
 class Property(Base):
     __tablename__ = "properties"
@@ -21,7 +24,11 @@ class Property(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
     website = Column(String(255), nullable=False, unique=True)
-
+    
+    # property_floorplans = relationship("FloorPlan", back_populates="floorplan_property")
+    # property_interests = relationship("Interested", back_populates="interests_property")
+    
+    
 
 class User(Base):
     __tablename__ = "users"
@@ -29,6 +36,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
 
+    # user_interests = relationship("Interested", back_populates="interests_user")
 
 
 class Interested(Base):
@@ -39,6 +47,6 @@ class Interested(Base):
     property_id = Column(Integer, ForeignKey("properties.id"), nullable=False)
     floorplan_id = Column(Integer, ForeignKey("floorplans.id"), nullable=False)
 
-    user = relationship("User", back_populates="property")
-    property = relationship("Property", back_populates="property")
-    floorplan = relationship("FloorPlan", back_populates="property")
+    # interests_user = relationship("User", back_populates="user_interests")
+    # interests_property = relationship("Property", back_populates="property_interests")
+    # interests_floorplan = relationship("FloorPlan", back_populates="floorplan_interests")

@@ -1,0 +1,27 @@
+[project]
+name = "scrapping_floorplan_data"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "ArinaKostanyan",email = "arinakostanyan@icloud.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10,<4.0"
+dependencies = [
+    "psycopg[binary, pool]>=3.1.16",
+    "ollama (>=0.4.7,<0.5.0)",
+    "fastapi (>=0.115.11,<0.116.0)",
+    "uvicorn (>=0.34.0,<0.35.0)",
+    "sqlalchemy (>=2.0.39,<3.0.0)",
+    "pymysql (>=1.1.1,<2.0.0)",
+    "alembic (>=1.15.1,<2.0.0)",
+    "cryptography (>=44.0.2,<45.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+package-mode = false
