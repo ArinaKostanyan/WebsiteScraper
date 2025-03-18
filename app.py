@@ -1,7 +1,6 @@
 import yaml
-from typing import Optional
-from fastapi import FastAPI
-from pydantic import BaseModel
+from typing import List
+from fastapi import Body, FastAPI
 
 # from alembic.config import Config
 # from alembic import command
@@ -18,6 +17,7 @@ from db import (
     get_interested_floorplan_by_user_id,
     delete_floorplan_data,
 )
+from models.models import Floorplan, InterestedFloorplan, Property, User
 from scrapper.website_scraper import PropertyWebsiteScrape
 
 # alembic_cfg = Config("alembic.ini")
@@ -30,29 +30,6 @@ app = FastAPI(
     version="1.0",
     description="API for managing properties and floorplans, including interested floorplans.",
 )
-
-
-class User(BaseModel):
-    name: str
-
-
-class Property(BaseModel):
-    property_name: str
-
-
-class Floorplan(BaseModel):
-    id: int
-    name: str
-    price: Optional[float] = None
-    bedrooms: Optional[int] = None
-    bathrooms: Optional[int] = None
-    square_feet: Optional[int] = None
-
-
-class InterestedFloorplan(BaseModel):
-    user_id: int
-    property_name: str
-    floorplan_name: Optional[str] = None
 
 
 property_websites = [
@@ -124,7 +101,7 @@ def scrape_data():
     return "Scraped data successfully inserted into MYSQL!", result
 
 
-@app.get("/floorplans", tags=["Floorplans"], response_model=Floorplan)
+@app.get("/floorplans", tags=["Floorplans"], response_model=List[Floorplan])
 def get_floorplans_by_filters(
     price_min: int | None = None,
     price_max: float | None = None,
@@ -144,7 +121,9 @@ def get_floorplans_by_filters(
     return {"Filtered rows: ": filtered_floorplans}
 
 
-@app.get("/floorplans/{property_name}", tags=["Floorplans"])
+@app.get(
+    "/floorplans/{property_name}", tags=["Floorplans"], response_model=List[Property]
+)
 def get_property(property_name: str):
     floorplan_by_name = get_floorplan_by_name(property_name)
     return {"Floorplan found with the given property name": floorplan_by_name}
@@ -152,16 +131,16 @@ def get_property(property_name: str):
 
 @app.get(
     "/floorplans/{property_name}/{floorplan_name}",
-    tags=["Floorplans"],
+    tags=["Floorplans", "Property"],
 )
-def get_property(property_name: str, floorplan_name: str):
+def get_floorplan(property_name: str, floorplan_name: str):
     floorplan_by_name_and_property = get_floorplan_by_floorplan_and_property_name(
         property_name, floorplan_name
     )
     return f"{floorplan_by_name_and_property} found with the given names"
 
 
-@app.post("/users", tags=["Users"])
+@app.post("/users", tags=["Users"], response_model=User)
 def add_user(user: User):
     store_user_in_db(user)
     return f"{user} user inserted into MySQL!"
@@ -188,20 +167,19 @@ def get_interested_by_user_id(user_id: int):
 
 
 @app.delete("/interested", tags=["Interested"])
-def delete_interested_by_user_id(property_data: InterestedFloorplan):
+def delete_interested(property_data: InterestedFloorplan = Body(...)):
     res = delete_floorplan_data(property_data)
     if type(res) != str:
         return f"Interested floorplan successfully deleted from MySQL!"
     return res
 
 
+@app.on_event("startup")
 def generate_openapi_yaml():
     openapi_schema = app.openapi()
     with open("swagger.yaml", "w") as f:
         yaml.dump(openapi_schema, f, default_flow_style=False)
 
-
-generate_openapi_yaml()
 
 if __name__ == "__main__":
     import uvicorn

@@ -60,6 +60,19 @@ components:
       - property_name
       title: InterestedFloorplan
       type: object
+    Property:
+      properties:
+        property_name:
+          title: Property Name
+          type: string
+        website:
+          title: Website
+          type: string
+      required:
+      - property_name
+      - website
+      title: Property
+      type: object
     User:
       properties:
         name:
@@ -165,7 +178,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Floorplan'
+                items:
+                  $ref: '#/components/schemas/Floorplan'
+                title: Response Get Floorplans By Filters Floorplans Get
+                type: array
           description: Successful Response
         '422':
           content:
@@ -190,7 +206,11 @@ paths:
         '200':
           content:
             application/json:
-              schema: {}
+              schema:
+                items:
+                  $ref: '#/components/schemas/Property'
+                title: Response Get Property Floorplans  Property Name  Get
+                type: array
           description: Successful Response
         '422':
           content:
@@ -203,7 +223,7 @@ paths:
       - Floorplans
   /floorplans/{property_name}/{floorplan_name}:
     get:
-      operationId: get_property_floorplans__property_name___floorplan_name__get
+      operationId: get_floorplan_floorplans__property_name___floorplan_name__get
       parameters:
       - in: path
         name: property_name
@@ -229,12 +249,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
-      summary: Get Property
+      summary: Get Floorplan
       tags:
       - Floorplans
+      - Property
   /interested:
     delete:
-      operationId: delete_interested_by_user_id_interested_delete
+      operationId: delete_interested_interested_delete
       requestBody:
         content:
           application/json:
@@ -253,7 +274,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
-      summary: Delete Interested By User Id
+      summary: Delete Interested
       tags:
       - Interested
     post:
@@ -329,7 +350,8 @@ paths:
         '200':
           content:
             application/json:
-              schema: {}
+              schema:
+                $ref: '#/components/schemas/User'
           description: Successful Response
         '422':
           content:
