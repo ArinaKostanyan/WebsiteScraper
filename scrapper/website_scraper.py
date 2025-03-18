@@ -2,15 +2,14 @@ import json
 from typing import Dict
 from scrapegraphai.graphs import SmartScraperMultiGraph
 
+
 class PropertyWebsiteScrape:
     graph_config = {
-    "llm": {
-        "model": "ollama/llama3.2",
-        "model_tokens": 8192
-    },
-    "verbose": True,
-    "headless": False,
-}
+        "llm": {"model": "ollama/llama3.2", "model_tokens": 8192},
+        "verbose": True,
+        "headless": False,
+    }
+
     def __init__(self, source):
         self.prompt = """Extract all available floor plan details from the website. Structure the extracted data as follows:
         Property Information:
@@ -31,15 +30,13 @@ class PropertyWebsiteScrape:
 
     def run(self):
         self.smart_scraper_graph = SmartScraperMultiGraph(
-        self.prompt, self.source, self.config
-    )
+            self.prompt, self.source, self.config
+        )
         return self.smart_scraper_graph.run()
-    
-    def get_result(self)->Dict:
-        print('\n'*3)
-        answer = self.run()
-        print('\nhello', answer)
 
-        
+    def get_result(self) -> Dict:
+
+        answer = self.run()
+        print("\nhello", answer)
+
         return json.dumps(answer)
-        
