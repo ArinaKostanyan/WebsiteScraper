@@ -1,8 +1,10 @@
-from sqlalchemy.orm import DeclarativeBase, relationship, Mapped
+from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
+
 
 class Base(DeclarativeBase):
     pass
+
 
 class FloorPlan(Base):
     __tablename__ = "floorplans"
@@ -14,9 +16,10 @@ class FloorPlan(Base):
     bathrooms = Column(Integer, nullable=True)
     square_feet = Column(Integer, nullable=True)
     property_id = Column(Integer, ForeignKey("properties.id"), nullable=False)
-    
+
     # floorplan_property = relationship("Property", back_populates="property_floorplans")
     # interests_floorplan = relationship("Interested", back_populates="interests_floorplan")
+
 
 class Property(Base):
     __tablename__ = "properties"
@@ -24,11 +27,10 @@ class Property(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
     website = Column(String(255), nullable=False, unique=True)
-    
+
     # property_floorplans = relationship("FloorPlan", back_populates="floorplan_property")
     # property_interests = relationship("Interested", back_populates="interests_property")
-    
-    
+
 
 class User(Base):
     __tablename__ = "users"
