@@ -1,5 +1,4 @@
 import yaml
-from typing import List
 from fastapi import Body, FastAPI
 
 # from alembic.config import Config
