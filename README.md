@@ -127,4 +127,53 @@ removes all flooplans of the property "Sunset Apartments"
 ---
 
 ## 5. Database Structure
- Design a Database Structure that fits the best of the requirements of the API.
+Design a Database Structure that fits the best of the requirements of the API.
+
+
+## Prerequisites
+
+Before you start, make sure you have the following installed:
+
+Python 3.8+
+Poetry (for dependency management)
+MySQL (or SQLite for development)
+Uvicorn (for running the FastAPI application)
+Installation
+
+## Setup Instructions
+
+1. Clone the repository
+```
+git clone https://github.com/ArinaKostanyan/WebsiteScraper
+cd WebsiteScrapper
+```
+2. Install dependencies with Poetry
+Make sure Poetry is installed. If not, you can install it by running:
+```
+curl -sSL https://install.python-poetry.org | python3 -
+```
+Then, install the dependencies:
+```
+poetry install
+```
+3. Configure your MySQL database
+Make sure you have MySQL running locally (or use any other MySQL-compatible database). Update the DATABASE_URL in your db.py:
+```
+DATABASE_URL = "mysql+pymysql://<username>:<password>@localhost/<database>"
+```
+## Run the FastAPI app
+Now you can start the FastAPI app using Uvicorn:
+```
+python app.py
+```
+The app should now be accessible at http://127.0.0.1:8000.
+
+6. Access the API Documentation
+You can access the interactive Swagger documentation for the API by visiting:
+
+http://127.0.0.1:8000/docs
+
+## Run tests
+```
+python -m pytest tests/test_main_app.py
+```

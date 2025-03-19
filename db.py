@@ -1,4 +1,5 @@
 from typing import Dict
+from fastapi import HTTPException
 from requests import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -73,9 +74,8 @@ def get_interested_floorplan_by_names(floorplan):
     floorplan_from_db = get_floorplan_by_floorplan_and_property_name(
         floorplan.property_name, floorplan.floorplan_name
     )
-    print("floorplan_from_db", floorplan_from_db)
-    if floorplan_from_db is None:
-        return "No floorplan found with given names"
+    if isinstance(floorplan_from_db, str):
+        return floorplan_from_db
 
     interested = Interested(
         property_id=floorplan_from_db.property_id,
@@ -117,17 +117,10 @@ def store_in_database(result: Dict, db: Session = db_changer):
     db.commit()
 
 
-def get_floorplan_by_name(property_name: str, db: Session = db_changer):
-    property = db.query(Property).filter(Property.name == property_name).first()
-    if property is None:
-        return "No property found with given name"
-    return db.query(FloorPlan).filter(FloorPlan.property_id == property.id).all()
-
-
 def get_property_by_name(property_name: str, db: Session = db_changer):
     property = db.query(Property).filter(Property.name == property_name).first()
     if property is None:
-        return "No property found with given name"
+        raise HTTPException(status_code=404, detail="No property found with given name")
     return property
 
 

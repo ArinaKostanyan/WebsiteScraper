@@ -8,8 +8,8 @@ from fastapi import Body, FastAPI
 from db import (
     get_app_description,
     get_filtered_floorplan,
-    get_floorplan_by_name,
     get_floorplan_by_floorplan_and_property_name,
+    get_property_by_name,
     store_in_database,
     store_user_in_db,
     get_user_by_id,
@@ -17,7 +17,7 @@ from db import (
     get_interested_floorplan_by_user_id,
     delete_floorplan_data,
 )
-from models.models import Floorplan, InterestedFloorplan, Property, User
+from models.models import InterestedFloorplan, User
 from scrapper.website_scraper import PropertyWebsiteScrape
 
 # alembic_cfg = Config("alembic.ini")
@@ -25,7 +25,7 @@ from scrapper.website_scraper import PropertyWebsiteScrape
 # alembic_cfg.set_main_option("sqlalchemy.url",  "mysql+pymysql://root:IHopeIWill@localhost:3306/scrapper_project_db")
 # command.upgrade(alembic_cfg, "head")
 
-app = FastAPI(
+fastapi_app = FastAPI(
     title="Property Management API",
     version="1.0",
     description="API for managing properties and floorplans, including interested floorplans.",
@@ -33,8 +33,8 @@ app = FastAPI(
 
 
 property_websites = [
-    "https://www.atmospheretempe.com/floor-plans/",
     "https://clemsonlivingsc.com/the-orchard/",
+    # "https://www.atmospheretempe.com/floor-plans/",
     # "https://rambleratlanta.com/floorplans/",
     # "https://www.millenniumok.com/floor-plans/",
     # "https://www.churchandhenley.com/floor-plans/",
@@ -44,12 +44,12 @@ property_websites = [
 ]
 
 
-@app.get("/", tags=["Root"])
+@fastapi_app.get("/", tags=["Root"])
 def root():
     return {"message": get_app_description()}
 
 
-@app.post("/scrape", tags=["Scrape websites"])
+@fastapi_app.post("/scrape", tags=["Scrape websites"])
 def scrape_data():
     instance = PropertyWebsiteScrape(property_websites)
     result = instance.get_result()
@@ -101,7 +101,7 @@ def scrape_data():
     return "Scraped data successfully inserted into MYSQL!", result
 
 
-@app.get("/floorplans", tags=["Floorplans"], response_model=List[Floorplan])
+@fastapi_app.get("/floorplans", tags=["Floorplans"])
 def get_floorplans_by_filters(
     price_min: int | None = None,
     price_max: float | None = None,
@@ -121,15 +121,13 @@ def get_floorplans_by_filters(
     return {"Filtered rows: ": filtered_floorplans}
 
 
-@app.get(
-    "/floorplans/{property_name}", tags=["Floorplans"], response_model=List[Property]
-)
+@fastapi_app.get("/floorplans/{property_name}", tags=["Floorplans"])
 def get_property(property_name: str):
-    floorplan_by_name = get_floorplan_by_name(property_name)
-    return {"Floorplan found with the given property name": floorplan_by_name}
+    floorplan_by_name = get_property_by_name(property_name)
+    return floorplan_by_name
 
 
-@app.get(
+@fastapi_app.get(
     "/floorplans/{property_name}/{floorplan_name}",
     tags=["Floorplans", "Property"],
 )
@@ -140,19 +138,19 @@ def get_floorplan(property_name: str, floorplan_name: str):
     return f"{floorplan_by_name_and_property} found with the given names"
 
 
-@app.post("/users", tags=["Users"], response_model=User)
+@fastapi_app.post("/users", tags=["Users"], response_model=User)
 def add_user(user: User):
     store_user_in_db(user)
     return f"{user} user inserted into MySQL!"
 
 
-@app.get("/users/{user_id}", tags=["Users"])
+@fastapi_app.get("/users/{user_id}", tags=["Users"])
 def get_user(user_id: int):
     user = get_user_by_id(user_id)
     return {"user found with the given ID": user}
 
 
-@app.post("/interested", tags=["Interested"])
+@fastapi_app.post("/interested", tags=["Interested"])
 def add_floorplan_interested(interested_floorplan: InterestedFloorplan):
     res = store_floorplan_in_interested(interested_floorplan)
     if type(res) != str:
@@ -160,13 +158,13 @@ def add_floorplan_interested(interested_floorplan: InterestedFloorplan):
     return res
 
 
-@app.get("/interested/{user_id}", tags=["Interested"])
+@fastapi_app.get("/interested/{user_id}", tags=["Interested"])
 def get_interested_by_user_id(user_id: int):
     interested_floorplan = get_interested_floorplan_by_user_id(user_id)
     return {"Interested floorplans found with the given user ID": interested_floorplan}
 
 
-@app.delete("/interested", tags=["Interested"])
+@fastapi_app.delete("/interested", tags=["Interested"])
 def delete_interested(property_data: InterestedFloorplan = Body(...)):
     res = delete_floorplan_data(property_data)
     if type(res) != str:
@@ -174,14 +172,15 @@ def delete_interested(property_data: InterestedFloorplan = Body(...)):
     return res
 
 
-@app.on_event("startup")
 def generate_openapi_yaml():
-    openapi_schema = app.openapi()
+    openapi_schema = fastapi_app.openapi()
     with open("swagger.yaml", "w") as f:
         yaml.dump(openapi_schema, f, default_flow_style=False)
 
 
+generate_openapi_yaml()
+
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="127.0.0.1", port=8080)
+    uvicorn.run(fastapi_app, host="127.0.0.1", port=8080)
