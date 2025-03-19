@@ -4,17 +4,28 @@
 We are going to scrape the floorplan data of some properties sites using LLMs. System scrapes property names, floorplan information, and prices from a list of websites using the ScrapegraphAI tool. It provides an API to retrieve floorplan data based on filters, also manages user interested lists, and handles user data.
 
 ## Technology Stack
-- **Backend**: Python (Django or FastAPI)
-- **Database**: SQLite (or PostgreSQL/MySQL for production)
+- **Backend**: Python FastAPI
+- **Database**: MySQL for production
 - **Web Scraping**: ScrapegraphAI (https://github.com/ScrapeGraphAI/Scrapegraph-ai)
-- **ORM**: Django or sqlalchemy
-- **API Documentation**: Swagger (via Django or FastAPI)
+- **ORM**: sqlalchemy
+- **API Documentation**: Swagger (via FastAPI)
 ---
 ## 1. Data Scraping
 
-### 1.1 Scraping Details
-- **Source**: Given list of property websites
-- **Tool**: ScrapegraphAI
+This project uses Ollama as an AI model provider to enhance the scraping process and make intelligent decisions during data extraction. Ollama allows you to access and utilize large language models (LLMs) to interact with and process data in a more flexible and robust way.
+
+### How to Use Ollama
+To get started with Ollama in this project, follow these steps:
+
+* Install Ollama: Make sure you have Ollama installed on your system. You can download and install it from [the official Ollama website](https://ollama.com/).
+* Once installed, you can check if it's working by running:
+ ```
+ollama version
+```
+* To run the Ollama server, you can use the following command:
+```
+ollama run llama3.2
+```
 
 #### List of Property Websites:
 1. https://www.atmospheretempe.com/floor-plans/
@@ -26,9 +37,7 @@ We are going to scrape the floorplan data of some properties sites using LLMs. S
 7. https://mapleridgeblacksburg.com/all-floor-plans/
 8. https://current-latimer.com/rates-floorplans/
 
-- **Source**: Given list of property websites
-- **Tool**: ScrapegraphAI
-- **Method**: Scraping via ScrapegraphAI
+
 
 ### 1.2 Required Fields
 Each property should have the following fields:
@@ -138,7 +147,6 @@ Python 3.8+
 Poetry (for dependency management)
 MySQL (or SQLite for development)
 Uvicorn (for running the FastAPI application)
-Installation
 
 ## Setup Instructions
 
